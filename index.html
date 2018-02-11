@@ -33,10 +33,11 @@ html, body {
     <div id="yes">YES</div>
     <div id="no">NO</div>
   </div>
+
   <script>
   (function() {
     var xmlhttp = new XMLHttpRequest();
-    var url = 'https://etcweb.princeton.edu/webfeeds/courseofferings/?term=current&fmt=json&subject=VIS&list=no';
+    var url = 'https://cors-anywhere.herokuapp.com/https://etcweb.princeton.edu/webfeeds/courseofferings/?term=current&fmt=json&subject=VIS&list=no';
 
     xmlhttp.onreadystatechange = function() {
       if (this.readyState == 4 && this.status == 200) {
