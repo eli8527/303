@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>IS THERE A CLASS IN 303</title>
+</head>
+<style>
+html, body {
+  margin: 0;
+  font-size: 4em;
+  font-family: sans-serif;
+  font-weight: bold;
+}
+#container {
+  width: 100vw;
+  height: 100vh;
+  background-color: white;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+}
+#yes {
+  color: black;
+  display: none;
+}
+#no {
+  color: black;
+  display: none;
+}
+</style>
+<body>
+  <div id="container">
+    <div id="yes">YES</div>
+    <div id="no">NO</div>
+  </div>
+  <script>
+  (function() {
+    var xmlhttp = new XMLHttpRequest();
+    var url = 'http://etcweb.princeton.edu/webfeeds/courseofferings/?term=current&fmt=json&subject=VIS&list=no';
+
+    xmlhttp.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+          var myArr = JSON.parse(this.responseText);
+          check303(myArr);
+      }
+    };
+
+    xmlhttp.open("GET", url, true);
+    xmlhttp.send();
+
+    function check303(data) {
+      if (classIn303(data)) {
+        document.getElementById('container').style.backgroundColor = '#f00';
+        document.getElementById('yes').style.display = 'block';
+      } else {
+        document.getElementById('container').style.backgroundColor = '#0f0';
+        document.getElementById('no').style.display = 'block';
+      }
+    }
+
+    function classIn303(data) {
+      // no current term ?
+      if (data.term.length === 0) {
+        return false;
+      }
+
+      var d = new Date();
+      var days = ['Su','M','T','W','Th','F','S'];
+      var dayofweek = days[d.getDay()];
+
+      var dummyDate = '1/1/18 ';
+      var now = Date.parse(dummyDate + d.toLocaleTimeString());
+      // console.log(now);
+      var courses = data.term[0].subjects[0].courses;
+      courses.forEach(function(course) {
+        // console.log(course);
+        course.classes.forEach(function(cls) {
+          cls.schedule.meetings.forEach(function(meeting) {
+            if (meeting.building && meeting.building.building_code === 'NA185') {
+              if (meeting.room === '303') {
+                var days = meeting.days;
+                days.forEach(function(day) {
+                  if (day === dayofweek) {
+                    var start = Date.parse(dummyDate + meeting.start_time);
+                    var end = Date.parse(dummyDate + meeting.end_time);
+
+                    if (now >= start && now <= end) {
+                      return true;
+                    } else {
+                      return false;
+                    }
+                  }
+                });
+                // console.log(course);
+              }
+            }
+          })
+        })
+      });
+      return false;
+    }
+  })();
+  </script>
+</body>
+</html>
